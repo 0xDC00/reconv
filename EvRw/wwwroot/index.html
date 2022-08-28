@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>ReConv - Bits and Pieces</title>
+    <base href="/" />
+    <link href="css/bootstrap/bootstrap.min.css" rel="stylesheet" />
+    <link href="css/app.css" rel="stylesheet" />
+    <link href="EvRw.styles.css" rel="stylesheet" />
+</head>
+
+<body>
+    <div id="app"><div style="position:absolute; top:30vh; width:100%; text-align:center"><h1>Loading<span class="loading"></span></h1></div></div>
+    <div id="blazor-error-ui">
+        An unhandled error has occurred.
+        <a href="" class="reload">Reload</a>
+        <a class="dismiss">🗙</a>
+    </div>
+    <script type="text/javascript">
+        (function () {
+            if (!String.prototype.decodeHTML) {
+                String.prototype.decodeHTML = function () {
+                    return this.replace(/&apos;/g, "'")
+                        .replace(/&quot;/g, '"')
+                        .replace(/&gt;/g, '>')
+                        .replace(/&lt;/g, '<')
+                        .replace(/&amp;/g, '&');
+                };
+            }
+
+            // term
+            const funcClear = function () { _term.clear(); };
+            window._clear = function () {
+                //console.clear();
+                if (window._term) {
+                    _term.clear();
+                    window._clear = funcClear;
+                }
+            }
+            const funcWriteLine = function (s) { _term.writelnAndScrool(s) };
+            window._writeln = function (s) {
+                if (window._term) {
+                    _term.writelnAndScrool(s);
+                    window._writeln = funcWriteLine;
+                }
+            }
+
+            const _oBodyAppendChild = document.body.appendChild;
+            document.body.appendChild = function (node) {
+                if (window.Module) {
+                    document.body.appendChild = _oBodyAppendChild;
+
+                    const __modulePrint = window.Module.print; // => console.log
+                    window.Module.print = function (text) {
+                        __modulePrint(text.replace(/\x1b\[\d+;\d+m/, ''));
+                        window._writeln(text);
+                    }
+                    const __modulePrintErr = window.Module.printErr;
+                    window.Module.printErr = function (text) {
+                        __modulePrintErr(text);
+                        window._writeln('\x1b[1;31m' + text + '\x1B[0m');
+                    }
+                }
+                return _oBodyAppendChild.call(document.body, node);
+            }
+        })();
+
+        window.downLoadFileFastUn = function (name, contentType, content) {
+            const nameStr = BINDING.conv_string(name);
+            const contentTypeStr = BINDING.conv_string(contentType);
+            const contentArray = Blazor.platform.toUint8Array(content);
+
+            const file = new File([contentArray], nameStr, { type: contentTypeStr });
+            const exportUrl = URL.createObjectURL(file);
+
+            const a = document.createElement("a");
+            document.body.appendChild(a);
+            a.href = exportUrl;
+            a.download = nameStr;
+            a.target = "_self";
+            a.click();
+
+            URL.revokeObjectURL(exportUrl);
+            return true;
+        }
+
+        window.InitSelectPickerPlugin = function () {
+            if (window.$) $('select').selectpicker();
+        }
+        window.SetSelectPickerValue = function (id, val) {
+            if (window.$) $(id).selectpicker('val', val);
+        }
+
+        window.InitTerminal = function () {
+            if (!window.Terminal) return;
+            const divId = 'terminal';
+            const term = new Terminal({
+                //disableStdin = true,
+                fontSize: 14,
+                fontFamily: 'Ubuntu Mono, courier-new, courier, monospace',
+                rows: 36,
+                scrollback: 9999999,
+                cursorStyle: 'underline',
+                convertEol: true,
+                theme: {
+                    background: '#1E1E1E',
+                    foreground: '#D4D4D4',
+                    selection: '#3A3D41'
+                },
+                windowsMode: true,
+            });
+            window._term = term;
+            term.onKey(function (e) {
+                switch (e.key) {
+                    case '\u0001':
+                        if (e.domEvent.ctrlKey)
+                            setTimeout(function () { term.selectAll(); }, 150);
+                        break;
+                    case '\u0003':
+                        if (e.domEvent.ctrlKey && term.hasSelection())
+                            document.execCommand('copy'); // term.copySelection();
+                        break;
+                }
+            });
+
+            term.loadAddon(new WebLinksAddon.WebLinksAddon());
+
+            const fitAddon = new FitAddon.FitAddon();
+            term.loadAddon(fitAddon);
+
+            const divElem = document.getElementById(divId);
+            term.open(divElem);
+
+            const viewportElem = term.element.firstElementChild;
+            term.writelnAndScrool = function (s) {
+                term.writeln(s);
+                if ((viewportElem.scrollHeight - viewportElem.offsetHeight) - viewportElem.scrollTop < 300)
+                    term.scrollToBottom();
+            }
+
+            fitAddon.fit();
+            const resizeObserver = new ResizeObserver(function (es) {
+                try {
+                    if (es[0].contentRect.width > 0 && es[0].contentRect.height > 0)
+                        fitAddon.fit();
+                } catch (err) { }
+            });
+            resizeObserver.observe(divElem);
+        }
+        
+        window.LoadXlsx = function (u8Array, m_percent) {
+            const result = [];
+
+            const wb = XLSX.read(u8Array, {
+                type: 'array',
+                cellHTML: false
+            });
+
+            if (isNaN(m_percent)) {
+                m_percent = 0;
+            }
+
+            const ymlName = '_init_.yaml';
+            const sheet_init_ = wb.Sheets[ymlName];
+            if (sheet_init_) {
+                const yaml = sheet_init_['A1'];
+                if (yaml && yaml.w) result.push(ymlName, yaml.w);
+            }
+            else {
+                var sheet_TABLE = wb.Sheets['TABLE'];
+                if (sheet_TABLE) {
+                    var yaml = '---\ntable: |-';
+                    var _table = '';
+                    const cellA1 = sheet_TABLE['A1'];
+                    const cellB1 = sheet_TABLE['B1'];
+                    if (cellA1 && cellA1.w) {
+                        _table = cellA1.w;
+                    }
+                    if (cellB1 && cellB1.w) {
+                        _table = _table + '\n' + cellB1.w;
+                    }
+                    if (_table) {
+                        const splited = _table.split(/[\r\n]+/);
+                        for (var i = 0; i < splited.length; i++) {
+                            yaml += '\n  ' + splited[i];
+                        }
+                        yaml += '\n...\n';
+                        result.push(ymlName, yaml);
+                    }
+                }
+            }
+
+            const sheetToc = wb.Sheets['TOC'];
+            if (sheetToc) {
+                const range = XLSX.utils.decode_range(sheetToc['!ref']);
+                for (var rowNum = range.s.r + 1; rowNum <= range.e.r; rowNum++) {
+                    const link = sheetToc[XLSX.utils.encode_cell({ r: rowNum, c: 0 })];
+                    const stat = sheetToc[XLSX.utils.encode_cell({ r: rowNum, c: 2 })];
+                    if (link && link.v && stat) {
+                        var path = link.w;
+                        const refs = link.l.location;
+                        const percent = stat.v;
+                        const percentFmt = stat.w;
+                        //let percentFml = stat.f;
+                        if (percent > m_percent) {
+                            const sheetName = refs.slice(0, -3).decodeHTML(); // !A1
+                            const sheet = wb.Sheets[sheetName];
+                            if (sheet) {
+                                window._writeln(percentFmt.padStart(7) + '  ' + path);
+                                if (!path.endsWith('.csv.x.csv')) {
+                                    const csv = XLSX.utils.sheet_to_csv(sheet);
+                                    result.push(path, csv);
+                                }
+                                else {
+                                    const js = XLSX.utils.sheet_to_json(sheet);
+                                    for (var i = 0; i < js.length; i++) {
+                                        path = js[i].ID;
+                                        var numLine = parseInt(js[++i].ID);
+                                        const jsPart = [];
+                                        while (numLine-- > 0) {
+                                            ++i;
+                                            var line = js[i];
+                                            if (!line.ID) {
+                                                numLine++;
+                                                continue;
+                                            }
+
+                                            jsPart.push(line);
+                                        }
+                                        window._writeln('       > ' + path);
+                                        const curSheet = XLSX.utils.json_to_sheet(jsPart);
+                                        const csv = XLSX.utils.sheet_to_csv(curSheet);
+                                        result.push(path, csv);
+                                    }
+                                }
+
+                            }
+                            else {
+                                if (window._term) window._writeln("\x1b[1;31mNot found: `" + sheetName + '`\x1B[0m');
+                                else console.log('Not found: `' + sheetName + '.csv`');
+                            }
+                        }
+                    }
+                }
+            }
+            else {
+                const sheetTocIdx = wb.Sheets['TOC_IDX'];
+                if (sheetTocIdx) {
+                    const range = XLSX.utils.decode_range(sheetTocIdx['!ref']);
+                    for (var rowNum = range.s.r + 1; rowNum <= range.e.r; rowNum++) {
+                        const name = sheetTocIdx[XLSX.utils.encode_cell({ r: rowNum, c: 0 })];
+                        const path = sheetTocIdx[XLSX.utils.encode_cell({ r: rowNum, c: 1 })];
+                        if (name.v && path.v) {
+                            const sheet = wb.Sheets[name.v];
+                            if (sheet) {
+                                const csv = XLSX.utils.sheet_to_csv(sheet);
+                                result.push(path.v, csv);
+                            }
+                        }
+                    }
+                }
+                else {
+                    for (var sheetName in wb.Sheets) {
+                        if (Object.hasOwnProperty.call(wb.Sheets, sheetName)) {
+                            window._writeln('       > ' + sheetName);
+                            const sheet = wb.Sheets[sheetName];
+                            const csv = XLSX.utils.sheet_to_csv(sheet);
+                            result.push(sheetName + '.csv', csv);
+                        }
+                    }
+                }
+            }
+            return result;
+        };
+
+        window.LoadXlsxUn = function (bytes, num) {
+            const u8Array = Blazor.platform.toUint8Array(bytes);
+            const result = window.LoadXlsx(u8Array, num);
+            return BINDING.js_array_to_mono_array(result);
+        }
+
+        window.CreateXlsx = function (bytes) {
+            let __wb;
+            if (bytes) {
+                const u8Array = Blazor.platform.toUint8Array(bytes);
+                __wb = XLSX.read(u8Array, {
+                    type: 'array',
+                    cellHTML: false
+                });
+            }
+            else {
+                __wb = XLSX.utils.book_new();
+            }
+            return {
+                dispose: function () {
+                    DotNet.disposeJSObjectReference(this);
+                },
+                wb: __wb,
+                ImportCsvUn: function (bytes, fields) {
+                    const u8Array = Blazor.platform.toUint8Array(bytes);
+                    const name = Blazor.platform.readStringField(fields, 0);
+                    const wb = XLSX.read(u8Array, { type: 'array' });
+                    XLSX.utils.book_append_sheet(this.wb, wb.Sheets.Sheet1, name);
+                    return true;
+                },
+                ImportJson: function (str, name) {
+                    const js = JSON.parse(str);
+                    const ws = XLSX.utils.json_to_sheet(js);
+                    XLSX.utils.book_append_sheet(this.wb, ws, name);
+                },
+                ExportJson: function () {
+                    const result = [];
+                    const sheetTocIdx = this.wb.Sheets['TOC_IDX'];
+                    if (sheetTocIdx) {
+                        const range = XLSX.utils.decode_range(sheetTocIdx['!ref']);
+                        for (var rowNum = range.s.r + 1; rowNum <= range.e.r; rowNum++) {
+                            const name = sheetTocIdx[XLSX.utils.encode_cell({ r: rowNum, c: 0 })];
+                            const path = sheetTocIdx[XLSX.utils.encode_cell({ r: rowNum, c: 1 })];
+                            if (name.v && path.v) {
+                                const sheet = this.wb.Sheets[name.v];
+                                if (sheet) {
+                                    const js = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+                                    result.push(path.v, JSON.stringify(js, null, 4));
+                                }
+                            }
+                        }
+                    }
+                    else {
+                        for (var sheetName in this.wb.Sheets) {
+                            if (Object.hasOwnProperty.call(this.wb.Sheets, sheetName)) {
+                                window._writeln('       > ' + sheetName);
+                                const sheet = this.wb.Sheets[sheetName];
+                                const js = XLSX.utils.sheet_to_json(sheet, { defval: '' });
+                                result.push(sheetName + '.json', JSON.stringify(js, null, 4));
+                            }
+                        }
+                    }
+
+                    return result;
+                },
+                ToArray: function () {
+                    return new Uint8Array(XLSX.write(this._wb, { type: 'array' }));
+                }
+            }
+        }
+        
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.slim.min.js" integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-Piv4xVNRyMGpqkS2by6br4gNJ7DXjqk09RmUpJ8jgGtD7zP9yug3goQfGII0yAns" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta2/dist/css/bootstrap-select.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta2/dist/js/bootstrap-select.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/xterm@4.12.0/css/xterm.css">
+    <script src="https://cdn.jsdelivr.net/npm/xterm-addon-fit@0.5.0/lib/xterm-addon-fit.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xterm-addon-web-links@0.4.0/lib/xterm-addon-web-links.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xterm@4.12.0/lib/xterm.min.js"></script>
+
+    <script src="_framework/blazor.webassembly.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.core.min.js" integrity="sha512-qcjxCpal2fC5XTlJBB6yc/T2g7Xuxd0uHz+syZZEByojMPnKXroczpN3vrxL3ifHx4RVy4Jj8jVkXseQ5irtWA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+</body>
+</html>

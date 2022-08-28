@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<!-- 9, preview -->
+		<LangVersion>9</LangVersion>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net6.0</TargetFramework>
+		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<!-- https://docs.microsoft.com/en-us/dotnet/core/deploying/trimming-options -->
+		<!-- https://docs.microsoft.com/en-us/dotnet/core/whats-new/dotnet-core-3-0#assembly-linking -->
+		<!--<PublishTrimmed>true</PublishTrimmed>-->
+		<!--<TrimMode>copyused</TrimMode>-->
+		<!--<TieredCompilationQuickJit>false</TieredCompilationQuickJit>-->
+		<NoWarn>CS0105</NoWarn>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\ExR.Format\ExR.Format.csproj" />
+	</ItemGroup>
+
+</Project>

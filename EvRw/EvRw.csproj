@@ -1,0 +1,89 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
+
+	<PropertyGroup>
+		<!-- 9, 10 vs preview -->
+		<TargetFramework>net6.0</TargetFramework>
+		<LangVersion>10</LangVersion>
+		<!--<Nullable>enable</Nullable>-->
+		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+		<!--<StaticWebAssetBasePath>FirstApp</StaticWebAssetBasePath>-->
+		<!-- CS0105 -->
+		<NoWarn>CS0105</NoWarn>
+	</PropertyGroup>
+
+	<PropertyGroup>
+		<!--<BlazorEnableCompression>true</BlazorEnableCompression>-->
+		<!--<BlazorWebAssemblyI18NAssemblies>none</BlazorWebAssemblyI18NAssemblies>-->
+		 <!-- https://docs.microsoft.com/en-us/aspnet/core/blazor/webassembly-performance-best-practices?view=aspnetcore-5.0#disable-unused-features  -->
+		 <!-- https://dev.to/j_sakamoto/workaround-how-to-resolve-local-time-zone-on-blazor-spa-v05x-foi  -->
+		<BlazorEnableTimeZoneSupport>false</BlazorEnableTimeZoneSupport><!--<InvariantGlobalization>true</InvariantGlobalization>--> <!-- preview7 error -->
+
+		<!--<TrimmerRemoveSymbols>true</TrimmerRemoveSymbols>
+		<DebuggerSupport>false</DebuggerSupport>
+		<EnableUnsafeBinaryFormatterSerialization>false</EnableUnsafeBinaryFormatterSerialization>
+		<EnableUnsafeUTF7Encoding>false</EnableUnsafeUTF7Encoding>
+		<HttpActivityPropagationSupport>false</HttpActivityPropagationSupport>-->
+		
+		<!-- https://docs.microsoft.com/en-us/dotnet/core/whats-new/dotnet-core-3-0#tiered-compilation --><!--
+		<PublishTrimmed>true</PublishTrimmed>
+		 --><!-- disable Quick JIT is enabled and creates fully optimized code  --><!--
+		<TieredCompilationQuickJit>false</TieredCompilationQuickJit>
+		--><!-- disable TC completely, use this MSBuild property --><!--
+		<TieredCompilation>false</TieredCompilation>
+		<BlazorWebAssemblyEnableLinking>false</BlazorWebAssemblyEnableLinking>-->
+		<!--<RunAOTCompilation>true</RunAOTCompilation>-->
+
+		<!-- https://docs.microsoft.com/en-us/dotnet/core/deploying/prepare-libraries-for-trimming  -->
+		<!-- [AssemblyMetadata("IsTrimmable", "True")] .NET6, copyused (asm) vs link (type) -->
+		<!-- https://docs.microsoft.com/en-us/dotnet/core/deploying/trimming-options  -->
+		<!-- https://docs.microsoft.com/en-us/dotnet/core/whats-new/dotnet-core-3-0#assembly-linking  -->
+		<!-- https://github.com/mono/linker/blob/main/docs/design/trimmed-assemblies.md  -->
+	</PropertyGroup>
+	
+	<PropertyGroup Condition="'$(Configuration)'!='DEBUG'">
+		<!-- Bug in .Net 6 Preview 7 - this should not be non-debug only. https://github.com/dotnet/runtime/issues/55750 -->
+		<InvariantGlobalization>true</InvariantGlobalization>
+		<!--<RunAOTCompilation>true</RunAOTCompilation>-->
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <Compile Remove="wwwroot\sample-data\**" />
+	  <Content Remove="wwwroot\sample-data\**" />
+	  <EmbeddedResource Remove="wwwroot\sample-data\**" />
+	  <None Remove="wwwroot\sample-data\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Remove="Pages\Counter.razor" />
+	  <Content Remove="Pages\FetchData.razor" />
+	  <Content Remove="Shared\NavMenu.razor" />
+	  <Content Remove="Shared\SurveyPrompt.razor" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Remove="Shared\NavMenu.razor.css" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly" Version="6.0.8" />
+		<PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="6.0.8" PrivateAssets="all" />
+		<PackageReference Include="Microsoft.Net.Compilers.Toolset" Version="4.2.0">
+		  <PrivateAssets>all</PrivateAssets>
+		  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\ExR.Format\ExR.Format.BLAZOR.csproj" />
+	</ItemGroup>
+</Project>
+

@@ -10,5 +10,6 @@ Live at: <https://tools.viethoagame.com/>
 **Supported formats:**
 - TODO...
 
-**Open source?**\
-Soon!
+## Community
+If you have contributions, need support, have suggestions,\
+or just want to get in touch with the team, join our [Discord server](https://discord.gg/cdmSkXR7j8)!

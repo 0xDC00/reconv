@@ -1,0 +1,100 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	
+	<PropertyGroup>
+		<!-- 9, preview -->
+		<LangVersion>9</LangVersion>
+		<TargetFramework>net6.0</TargetFramework>
+		<SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+		<ProduceReferenceAssembly>false</ProduceReferenceAssembly>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<NoWarn>1701;1702;CS8632;CS0436;CS0105</NoWarn>
+		<DefineConstants>TRACE;HAS_NULLABLEANNOTATIONS</DefineConstants>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<NoWarn>1701;1702;CS8632;CS0436;CS0105</NoWarn>
+		<DefineConstants>HAS_NULLABLEANNOTATIONS</DefineConstants>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<EmscriptenEnvVars Include="PYTHONUTF8=1" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Compile Remove="OldBuf\XTermLogListener.cs" />
+		<Compile Remove="Others\Zio\FileSystems\AggregateFileSystem.cs" />
+		<Compile Remove="Others\Zio\FileSystems\AggregateFileSystemWatcher.cs" />
+		<Compile Remove="Others\Zio\FileSystems\MountFileSystem.cs" />
+		<Compile Remove="Others\Zio\FileSystems\ReadOnlyFileSystem.cs" />
+		<Compile Remove="__TextConv.XLSX_BLAZOR.cs" />
+	</ItemGroup>
+	
+	<ItemGroup>
+		<PackageReference Include="Shaman.EPPlus" Version="1.0.1.3" />
+	</ItemGroup>
+	
+	<ItemGroup>
+		<None Update="Others\SpanJson\Formatters\BclFormatter.tt">
+			<LastGenOutput>BclFormatter.cs</LastGenOutput>
+			<Generator>TextTemplatingFileGenerator</Generator>
+		</None>
+		<None Update="Others\SpanJson\Formatters\Dynamic\SpanJsonDynamicString.Operators.tt">
+			<LastGenOutput>SpanJsonDynamicString.Operators.cs</LastGenOutput>
+			<Generator>TextTemplatingFileGenerator</Generator>
+		</None>
+		<None Update="Others\SpanJson\Formatters\Dynamic\SpanJsonDynamicNumber.Operators.tt">
+			<LastGenOutput>SpanJsonDynamicNumber.Operators.cs</LastGenOutput>
+			<Generator>TextTemplatingFileGenerator</Generator>
+		</None>
+		<None Update="Others\SpanJson\JsonWriter.PrimitiveWrappers.tt">
+			<LastGenOutput>JsonWriter.PrimitiveWrappers.cs</LastGenOutput>
+			<Generator>TextTemplatingFileGenerator</Generator>
+		</None>
+		<None Update="Others\SpanJson\JsonReader.PrimitiveWrappers.tt">
+			<LastGenOutput>JsonReader.PrimitiveWrappers.cs</LastGenOutput>
+			<Generator>TextTemplatingFileGenerator</Generator>
+		</None>
+		<None Update="Others\SpanJson\JsonWriter.Utf8.WriteVerbatimIntegers.tt">
+			<Generator>TextTemplatingFileGenerator</Generator>
+			<LastGenOutput>JsonWriter.Utf8.WriteVerbatimIntegers.cs</LastGenOutput>
+		</None>
+		<Compile Update="Others\SpanJson\Formatters\BclFormatter.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>BclFormatter.tt</DependentUpon>
+		</Compile>
+		<Compile Update="Others\SpanJson\Formatters\Dynamic\SpanJsonDynamicString.Operators.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>SpanJsonDynamicString.Operators.tt</DependentUpon>
+		</Compile>
+		<Compile Update="Others\SpanJson\Formatters\Dynamic\SpanJsonDynamicNumber.Operators.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>SpanJsonDynamicNumber.Operators.tt</DependentUpon>
+		</Compile>
+		<Compile Update="Others\SpanJson\JsonReader.PrimitiveWrappers.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>JsonReader.PrimitiveWrappers.tt</DependentUpon>
+		</Compile>
+		<Compile Update="Others\SpanJson\JsonWriter.Utf8.WriteVerbatimIntegers.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>JsonWriter.Utf8.WriteVerbatimIntegers.tt</DependentUpon>
+		</Compile>
+		<Compile Update="Others\SpanJson\JsonWriter.PrimitiveWrappers.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>JsonWriter.PrimitiveWrappers.tt</DependentUpon>
+		</Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+	</ItemGroup>
+</Project>

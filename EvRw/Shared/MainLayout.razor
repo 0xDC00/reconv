@@ -1,0 +1,54 @@
+﻿@inherits LayoutComponentBase
+@inject NavigationManager _navManager
+
+<div class="page">
+    @*<div class="sidebar">
+            <NavMenu />// about:blank, home
+        </div>*@
+
+    <div class="main">
+        <div class="top-row px-4">
+            <a hidden="@(!isReadMe)" href="javascript:history.length > 2 ? history.back() : window.location.href='./'" class="ml-md-auto">HOME</a>
+            <a hidden="@(isReadMe)" href="./readme" class="ml-md-auto">README</a>
+        </div>
+        @*<div class="content px-4">*@
+        <div class="content">
+            @Body
+        </div>
+    </div>
+</div>
+
+@code {
+    bool isReadMe = false; // default HOME
+    //protected override void OnInitialized()
+    //{
+    //    //isReadMe = _navManager.Uri.EndsWith("/readme", StringComparison.OrdinalIgnoreCase);
+    //    // false => no ShouldRender
+    //    // true => ShouldRender
+
+    //    base.OnInitialized();
+    //    Console.WriteLine("OnInitialized: " + isReadMe);
+    //    //_navManager.LocationChanged += HandleLocationChanged;
+    //}
+
+    //protected override void OnAfterRender(bool firstRender)
+    //{
+    //    base.OnAfterRender(firstRender);
+    //}
+
+    protected override bool ShouldRender()
+    {
+        // clickLink -> ShouldRender -> OnAfterRender -> HandleLocationChanged (this) -> HandleLocationChanged (index)
+        //isReadMe = _navManager.Uri.EndsWith("/readme", StringComparison.OrdinalIgnoreCase);
+        //Console.WriteLine("ShouldRender: " + isReadMe);
+        isReadMe = !isReadMe;
+        return base.ShouldRender();
+    }
+
+    //private void HandleLocationChanged(object sender, LocationChangedEventArgs e)
+    //{
+    //    //Console.WriteLine("HandleLocationChanged");
+    //    isReadMe = !isReadMe;
+    //    StateHasChanged();
+    //}
+}

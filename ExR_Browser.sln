@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.2.32408.312
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EvRw", "EvRw\EvRw.csproj", "{44C21AF7-5201-44F5-97EA-9791A630A5FF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ExR.Format.Blazor", "ExR.Format\ExR.Format.Blazor.csproj", "{5BFE0234-B016-41E4-857D-206023165876}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{44C21AF7-5201-44F5-97EA-9791A630A5FF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{44C21AF7-5201-44F5-97EA-9791A630A5FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{44C21AF7-5201-44F5-97EA-9791A630A5FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{44C21AF7-5201-44F5-97EA-9791A630A5FF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5BFE0234-B016-41E4-857D-206023165876}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5BFE0234-B016-41E4-857D-206023165876}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5BFE0234-B016-41E4-857D-206023165876}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5BFE0234-B016-41E4-857D-206023165876}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F6C82BCB-75BF-490A-8FCF-FEFD53F9442F}
+	EndGlobalSection
+EndGlobal
